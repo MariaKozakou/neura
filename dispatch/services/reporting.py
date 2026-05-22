@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from django.utils import timezone
 
 from dispatch.models import DispatchResult, TimeSeriesPoint
-from dispatch.services.battery_dispatch import STEP_HOURS
+from dispatch.services.battery_dispatch import BATTERY_CAPACITY_KWH, STEP_HOURS
 
 
 @dataclass(frozen=True)
@@ -59,15 +59,18 @@ def build_weekly_report() -> WeeklyReport:
 
 def _build_soc_chart(dispatch_results: list[DispatchResult]) -> str:
     timestamps = [timezone.localtime(result.timestamp) for result in dispatch_results]
-    soc_values = [result.soc_kwh for result in dispatch_results]
+    soc_values = [100 * result.soc_kwh / BATTERY_CAPACITY_KWH for result in dispatch_results]
 
     figure, axis = plt.subplots(figsize=(10, 3.8), dpi=140)
     axis.plot(timestamps, soc_values, color="#0f766e", linewidth=2)
     axis.fill_between(timestamps, soc_values, color="#99f6e4", alpha=0.35)
     axis.set_title("Battery state of charge over the representative week")
-    axis.set_ylabel("SoC (kWh)")
+    axis.set_ylabel("SoC (%)")
     axis.set_xlabel("Time")
-    axis.set_ylim(0, 400)
+    axis.set_ylim(0, 100)
+    axis.axhline(10, color="#b45309", linestyle="--", linewidth=1, label="10% min")
+    axis.axhline(95, color="#64748b", linestyle="--", linewidth=1, label="95% max")
+    axis.legend(loc="upper right")
     axis.grid(True, alpha=0.25)
     figure.autofmt_xdate()
     figure.tight_layout()

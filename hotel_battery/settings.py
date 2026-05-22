@@ -1,10 +1,12 @@
+#ποια apps υπάρχουν,ποια database χρησιμοποιούμε,timezone,templates,static files
+
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "dev-only-secret-key"
 DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
+ALLOWED_HOSTS: list[str] = []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -47,7 +49,6 @@ WSGI_APPLICATION = "hotel_battery.wsgi.application"
 
 DATABASES = {
     "default": {
-        # SQLite keeps the take-home self-contained: no local Postgres setup needed.
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }

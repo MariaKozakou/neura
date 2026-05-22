@@ -1,10 +1,8 @@
 ﻿# Neura Take-Home Assessment
 
-Small Django service for a behind-the-meter battery dispatch simulation for a Limassol hotel.
+Service for a behind-the-meter battery dispatch simulation for a Cyprus hotel(Limassol).
 
 ## Setup
-
-From the cloned repository root:
 
 ```bash
 pip install -r requirements.txt
@@ -15,9 +13,9 @@ If your Windows shell uses the Python launcher, replace `python` with `py`.
 
 Open the weekly report at http://127.0.0.1:8010/reports/weekly/.
 
-The `run_local.py` helper applies migrations, seeds the representative week, and starts the Django development server.
+The `run_local.py` command applies migrations, seeds the representative week, and starts the Django development server, our helper script.
 
-Run the dispatch tests with:
+Run the tests with:
 
 ```bash
 python manage.py test
@@ -28,8 +26,13 @@ python manage.py test
 The seed command creates one representative 15-minute week with 672 points.
 
 - Solar: reads `data/solar_renewables_ninja_limassol_2019_week.csv`, generated from Renewables.ninja point PV output near Limassol (`lat=34.6852901`, `lon=33.0332657`) for a 200 kW system using MERRA-2, 10% system loss, fixed tilt 35 degrees, and south-facing azimuth 180 degrees.
-- Resampling: Renewables.ninja exported hourly `electricity` values in kW for 2019. I filtered the representative summer week from 2019-07-01 00:00 through 2019-07-07 23:00 UTC and linearly interpolated between hourly values to create 15-minute points.
-- Optional solar fetch: if the CSV is missing and `RENEWABLES_NINJA_TOKEN` is set, the seed command can call Renewables.ninja with the same core assumptions and save the response as a CSV fixture. This is not required for review because the processed CSV is committed.
+
+
+- Resampling: Renewables.ninja exported hourly `electricity` values in kW for 2019. I filtered the representative week from 2019-07-01 00:00 through 2019-07-07 23:00 UTC , summer time and linearly interpolated between hourly values to create 15-minute points.
+
+- Solar fetch: if the CSV is missing and `RENEWABLES_NINJA_TOKEN` is set, the seed command calls Renewables.ninja for Limassol. The request uses a 200 kW PV system, MERRA-2, 10% system loss, fixed tilt 35 degrees, and south-facing azimuth 180 degrees. The hourly response is linearly interpolated to 15-minute points and saved as the CSV fixture.
+
+
 - Solar fallback: if neither the CSV nor a token is present, the command uses a simple clear-sky shaped PV profile so the project remains runnable for local review, but the committed CSV is the primary path.
 
 - Load: synthetic hotel demand with a constant overnight base, higher weekend occupancy, afternoon cooling peak, and smaller evening activity bump. It is capped at 200 kW to match the task scenario.
@@ -58,7 +61,7 @@ The dispatch is a greedy 15-minute simulation:
 
 I used ChatGPT/Codex as a pair-programming assistant rather than as a black box. It helped me turn the PDF brief into a small Django MVP, scaffold the project structure, draft the dispatch service, and helped with the suggested tests for the key constraints: SoC bounds, power limits, no grid export, and kW-to-kWh conversion.
 
-I manually reviewed the battery logic, kept the architecture intentionally simple, created a documented synthetic hotel load profile, and included the processed Renewables.ninja CSV so reviewers can run the project without an API token.
+I manually reviewed the battery logic, kept the architecture intentionally simple, adjusted the synthetic hotel load assumptions, and documented the reproducibility limits around renewables.ninja/API-token access. 
 
 AI was useful for Django boilerplate and test coverage, but I had to push back when it tried to overcomplicate the design and I double-checked the unit conversions myself.
 
