@@ -4,6 +4,8 @@ Small Django service for a behind-the-meter battery dispatch simulation for a Li
 
 ## Setup
 
+From the cloned repository root:
+
 ```bash
 pip install -r requirements.txt
 python run_local.py
@@ -15,7 +17,7 @@ Open the weekly report at http://127.0.0.1:8010/reports/weekly/.
 
 The `run_local.py` helper applies migrations, seeds the representative week, and starts the Django development server.
 
-Run the tests with:
+Run the dispatch tests with:
 
 ```bash
 python manage.py test
